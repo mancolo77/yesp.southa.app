@@ -137,7 +137,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'ОЛИМ',
+                      'SPORTS',
                       style: GoogleFonts.outfit(
                         fontSize: 32,
                         fontWeight: FontWeight.w900,

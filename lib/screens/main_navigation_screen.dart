@@ -1,55 +1,34 @@
 import 'package:flutter/material.dart';
-import '../services/workout_diary_service.dart';
 import '../theme/app_theme.dart';
-import 'tabs/today_tab.dart';
-import 'tabs/calendar_tab.dart';
-import 'tabs/progress_tab.dart';
+import 'tabs/matches_tab.dart';
+import 'tabs/standings_tab.dart';
+import 'tabs/favorites_tab.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+  final int initialIndex;
+  const MainNavigationScreen({super.key, this.initialIndex = 0});
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _currentIndex = 0;
-  bool _isLoading = true;
+  late int _currentIndex;
 
   final List<Widget> _tabs = const [
-    TodayTab(),
-    CalendarTab(),
-    ProgressTab(),
+    MatchesTab(),
+    StandingsTab(),
+    FavoritesTab(),
   ];
 
   @override
   void initState() {
     super.initState();
-    _initData();
-  }
-
-  Future<void> _initData() async {
-    await WorkoutDiaryService().init();
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    _currentIndex = widget.initialIndex;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: AppTheme.background,
-        body: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -60,43 +39,34 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: AppTheme.darkNavy,
+          color: AppTheme.darkNav,
+          border: Border(top: BorderSide(color: AppTheme.border, width: 0.5)),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          backgroundColor: AppTheme.darkNavy,
+          onTap: (index) => setState(() => _currentIndex = index),
+          backgroundColor: AppTheme.darkNav,
           selectedItemColor: AppTheme.primary,
-          unselectedItemColor: AppTheme.decorStripes,
-          selectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
+          unselectedItemColor: AppTheme.textSecondary,
           type: BottomNavigationBarType.fixed,
           elevation: 0,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.today_outlined),
-              activeIcon: Icon(Icons.today_rounded),
-              label: 'Сегодня',
+              icon: Icon(Icons.sports_soccer_outlined),
+              activeIcon: Icon(Icons.sports_soccer_rounded),
+              label: 'Matches',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month_outlined),
-              activeIcon: Icon(Icons.calendar_month_rounded),
-              label: 'Календарь',
+              icon: Icon(Icons.leaderboard_outlined),
+              activeIcon: Icon(Icons.leaderboard_rounded),
+              label: 'Standings',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.insights_outlined),
-              activeIcon: Icon(Icons.insights_rounded),
-              label: 'Прогресс',
+              icon: Icon(Icons.star_outline_rounded),
+              activeIcon: Icon(Icons.star_rounded),
+              label: 'Favorites',
             ),
           ],
         ),
