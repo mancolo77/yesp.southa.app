@@ -1,113 +1,134 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Olimp.bet Signature Brand Colors
-  static const Color primary = Color(0xFFE51B24); // Signature Olimp Red
-  static const Color primaryDark = Color(0xFFB51019); // Deep Crimson
-  static const Color primaryLight = Color(0xFFFF333D); // Vivid Red
-  static const Color secondary = Color(0xFFF5BA31); // Olimp Gold / Amber
-  static const Color goldDark = Color(0xFFD49A1A);
-  static const Color burgundy = Color(0xFF38080E); // Deep Luxury Burgundy
-  static const Color burgundyLight = Color(0xFF520E17);
+  // ПАЛИТРА ПО ТЗ (YesP / Дневник спортивной активности):
+  // • #FFFFFF — основной фон и карточки.
+  // • #F3F5F7 — фон секций и полей ввода.
+  // • #102638 — заголовки, нижняя навигация и контрастные блоки.
+  // • #1C4562 — дополнительные синие поверхности.
+  // • #F58224 — основной оранжевый акцент: кнопки и активные элементы.
+  // • #A94708 — текстовые акценты на светлом фоне.
+  // • #C7CCD6 — декоративные диагональные полосы.
+  // • #536170 — второстепенный текст.
+  // • #E1E5EA — разделители и контуры.
+  // • #347A36 — отметки выполненных занятий.
+  // На оранжевых кнопках использовать текст #102638, на тёмно-синих поверхностях — #FFFFFF.
 
-  // Status & Utility Colors
-  static const Color accentGreen = Color(0xFF10B981); // Success Emerald
-  static const Color accentRose = Color(0xFFEF4444); // Error / Danger
+  static const Color background = Color(0xFFFFFFFF);
+  static const Color surfaceCard = Color(0xFFFFFFFF);
+  static const Color surfaceSection = Color(0xFFF3F5F7);
+  static const Color darkNavy = Color(0xFF102638);
+  static const Color navySurface = Color(0xFF1C4562);
+  static const Color primary = Color(0xFFF58224); // Оранжевый акцент
+  static const Color textAccent = Color(0xFFA94708);
+  static const Color decorStripes = Color(0xFFC7CCD6);
+  static const Color textSecondary = Color(0xFF536170);
+  static const Color border = Color(0xFFE1E5EA);
+  static const Color completedGreen = Color(0xFF347A36);
+  static const Color onPrimary = Color(0xFF102638);
+
+  // Совместимость
+  static const Color surface = surfaceCard;
+  static const Color surfaceElevated = surfaceSection;
+  static const Color surfaceBorder = border;
+  static const Color textPrimary = darkNavy;
+  static const Color textMuted = textSecondary;
+  static const Color secondary = darkNavy;
+  static const Color accentGreen = completedGreen;
+  static const Color accentRose = Color(0xFFEF4444);
+  static const Color accentGold = primary;
   static const Color accentPurple = Color(0xFF8B5CF6);
-  static const Color accentGold = Color(0xFFF5BA31);
+  static const Color burgundy = darkNavy;
+  static const Color burgundyLight = navySurface;
 
-  // Dark Theme Background Surfaces (Olimp.bet obsidian / charcoal)
-  static const Color background = Color(0xFF0F0F12); // Deep Obsidian
-  static const Color surface = Color(0xFF17171C); // Dark Slate Surface
-  static const Color surfaceCard = Color(0xFF1F2026); // Elevated Card Surface
-  static const Color surfaceElevated = Color(0xFF262730); // Higher Elevation
-  static const Color surfaceBorder = Color(0xFF2E303A); // Crisp Card Border
+  static const double cardRadius = 16.0;
+  static const double buttonRadius = 12.0;
+  static const double screenPadding = 16.0;
+  static const double buttonHeight = 48.0;
 
-  // Text Colors
-  static const Color textPrimary = Color(0xFFFFFFFF); // Pure White
-  static const Color textSecondary = Color(0xFF9EA3AE); // Cool Silver Grey
-  static const Color textMuted = Color(0xFF6B7280); // Muted Charcoal Grey
-
-  // Signature Olimp Gradients
-  static const LinearGradient redGradient = LinearGradient(
-    colors: [primary, primaryDark],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient burgundyGradient = LinearGradient(
-    colors: [Color(0xFF38080E), Color(0xFF1A0407)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient goldGradient = LinearGradient(
-    colors: [Color(0xFFF5BA31), Color(0xFFD49A1A)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient cardGradient = LinearGradient(
-    colors: [Color(0xFF22232B), Color(0xFF1B1B22)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  // Box Shadows
-  static List<BoxShadow> get redGlow => [
+  static List<BoxShadow> get cardShadow => [
         BoxShadow(
-          color: primary.withAlpha(70),
-          blurRadius: 18,
-          spreadRadius: 2,
+          color: Colors.black.withAlpha(12),
+          blurRadius: 10,
+          offset: const Offset(0, 3),
         ),
       ];
 
-  static List<BoxShadow> get goldGlow => [
+  static List<BoxShadow> get orangeGlow => [
         BoxShadow(
-          color: secondary.withAlpha(60),
+          color: primary.withAlpha(60),
           blurRadius: 16,
           spreadRadius: 1,
         ),
       ];
 
-  static List<BoxShadow> get neonGlow => redGlow;
+  static List<BoxShadow> get neonGlow => orangeGlow;
+  static List<BoxShadow> get redGlow => orangeGlow;
+  static List<BoxShadow> get goldGlow => orangeGlow;
 
-  static ThemeData get darkTheme {
+  static const LinearGradient heroGradient = LinearGradient(
+    colors: [darkNavy, navySurface],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient cardGradient = LinearGradient(
+    colors: [surfaceCard, surfaceSection],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient redGradient = LinearGradient(
+    colors: [primary, textAccent],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient goldGradient = redGradient;
+  static const LinearGradient burgundyGradient = heroGradient;
+
+  static ThemeData get lightTheme {
     return ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: background,
       primaryColor: primary,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: primary,
-        secondary: secondary,
-        surface: surface,
+        secondary: darkNavy,
+        surface: surfaceCard,
         error: accentRose,
+        onPrimary: onPrimary,
+        onSurface: darkNavy,
       ),
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData.dark().textTheme,
-      ).apply(
-        bodyColor: textPrimary,
-        displayColor: textPrimary,
+      fontFamily: null, // Системный шрифт
+      textTheme: const TextTheme(
+        headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: darkNavy),
+        headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: darkNavy),
+        titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkNavy),
+        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: darkNavy),
+        bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: darkNavy),
+        bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: textSecondary),
+        bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.normal, color: textSecondary),
       ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: surface,
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primary,
+          foregroundColor: onPrimary,
+          minimumSize: const Size(0, buttonHeight),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(buttonRadius)),
+          elevation: 0,
+        ),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: background,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.outfit(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: textPrimary,
-          letterSpacing: 0.5,
-        ),
-        iconTheme: const IconThemeData(color: textPrimary),
-      ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: surface,
-        selectedItemColor: primary,
-        unselectedItemColor: textMuted,
-        elevation: 8,
+        titleTextStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: darkNavy),
+        iconTheme: IconThemeData(color: darkNavy),
       ),
     );
   }
+
+  static ThemeData get darkTheme => lightTheme;
 }
