@@ -51,3 +51,4 @@ class WorkoutEntry {
         isCompleted: json['isCompleted'] as bool? ?? false,
       );
 }
+

@@ -209,3 +209,4 @@ class WorkoutStorageService extends ChangeNotifier {
     return map;
   }
 }
+
