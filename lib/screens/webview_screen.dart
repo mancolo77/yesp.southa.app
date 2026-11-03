@@ -21,7 +21,8 @@ class _AppWebViewScreenState extends State<AppWebViewScreen> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(AppTheme.background)
+      ..setUserAgent('Mozilla/5.0 (Linux; Android 14; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36')
+      ..setBackgroundColor(Colors.white)
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (progress) {

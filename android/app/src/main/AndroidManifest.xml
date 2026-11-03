@@ -4,7 +4,7 @@
     <application
         android:label="YesP"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon" android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -47,6 +47,10 @@
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+            <!-- Disable Impeller to fix Adreno GPU Vulkan shader compilation crashes / black screen -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

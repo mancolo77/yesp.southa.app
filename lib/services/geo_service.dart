@@ -6,32 +6,38 @@ import 'package:http/http.dart' as http;
 class GeoService {
   /// Fetches the user's 2-letter ISO country code (e.g. 'RU', 'DE', 'KG', 'KZ', 'GB')
   /// exclusively based on the user's IP address.
-  /// Queries 4 public geolocation providers simultaneously (geojs, country.is, myip, ipwho.is).
+  /// Queries 4 public geolocation providers simultaneously and returns immediately
+  /// upon the FASTEST successful response.
   static Future<String?> getCountryCode() async {
-    try {
-      final providers = <Future<String?>>[
-        _fetchFromGeoJs(),
-        _fetchFromCountryIs(),
-        _fetchFromMyIp(),
-        _fetchFromIpWhoIs(),
-      ];
+    final completer = Completer<String?>();
+    int pending = 4;
 
-      // Wait for all providers concurrently with individual timeouts
-      final results = await Future.wait(providers);
-      for (final code in results) {
+    void onResult(String? code) {
+      if (!completer.isCompleted) {
         if (code != null && RegExp(r'^[A-Z]{2}$').hasMatch(code)) {
           if (kDebugMode) {
-            print('[GeoService] Detected country by IP: $code');
+            print('[GeoService] Detected country by IP (fastest provider): $code');
           }
-          return code;
+          completer.complete(code);
+          return;
+        }
+        pending--;
+        if (pending <= 0) {
+          completer.complete(null);
         }
       }
-    } catch (e) {
-      if (kDebugMode) {
-        print('[GeoService] Error detecting IP country: $e');
-      }
     }
-    return null;
+
+    _fetchFromCountryIs().then(onResult).catchError((_) => onResult(null));
+    _fetchFromGeoJs().then(onResult).catchError((_) => onResult(null));
+    _fetchFromMyIp().then(onResult).catchError((_) => onResult(null));
+    _fetchFromIpWhoIs().then(onResult).catchError((_) => onResult(null));
+
+    // Overall timeout 2.5s
+    return completer.future.timeout(
+      const Duration(milliseconds: 2500),
+      onTimeout: () => null,
+    );
   }
 
   /// Provider 1: geojs (https://get.geojs.io/v1/ip/country.json)

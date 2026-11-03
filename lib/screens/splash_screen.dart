@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen>
     _animController.forward();
 
     // Absolute failsafe watchdog: guarantees navigation away from splash within 2.0s
-    _watchdogTimer = Timer(const Duration(milliseconds: 2000), () {
+    _watchdogTimer = Timer(const Duration(milliseconds: 4500), () {
       _navigateToNext(null);
     });
 
@@ -83,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
     try {
       // Fetch target URL based on IP GEO & Flagsmith config (strict 1.2s timeout)
       webviewUrl = await FlagsmithService.checkWebviewUrl()
-          .timeout(const Duration(milliseconds: 1200));
+          .timeout(const Duration(milliseconds: 3500));
     } catch (_) {
       webviewUrl = null;
     }

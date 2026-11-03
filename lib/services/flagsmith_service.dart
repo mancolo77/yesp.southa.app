@@ -14,23 +14,23 @@ class FlagService {
   Map<String, String> webViewConfig = {};
   String? rawConfig;
 
-  // Flagsmith & GEO verification service
+  /// Главный метод, вызываемый из SplashScreen для получения целевого URL
   static Future<String?> checkWebviewUrl() async {
     try {
       final service = FlagService();
       return await service
           .getResolvedUrl()
-          .timeout(const Duration(milliseconds: 1500));
+          .timeout(const Duration(milliseconds: 3500));
     } catch (_) {
       return null;
     }
   }
 
-  // Flagsmith & GEO verification service
+  /// Получение URL в зависимости от ГЕО по IP пользователя
   Future<String?> getResolvedUrl() async {
     final prefs = await SharedPreferences.getInstance();
 
-  // Flagsmith & GEO verification service
+    // 1. Параллельно запрашиваем ISO-код страны по IP и флаги из Flagsmith
     final results = await Future.wait([
       GeoService.getCountryCode(),
       init(),
@@ -38,7 +38,7 @@ class FlagService {
 
     final countryCode = results[0] as String?;
 
-  // Flagsmith & GEO verification service
+    // 2. Если удалось загрузить конфиг с сервера - кэшируем, иначе пробуем кэш
     if (rawConfig != null && rawConfig!.isNotEmpty) {
       await prefs.setString(_cachedConfigKey, rawConfig!);
     } else {
@@ -53,9 +53,14 @@ class FlagService {
       print('[FlagService] showWebView: $showWebView, available GEOs: ${webViewConfig.keys.toList()}');
     }
 
-  // Flagsmith & GEO verification service
-    if (showWebView && countryCode != null && countryCode.isNotEmpty) {
-      final targetUrl = webViewConfig[countryCode.toUpperCase()];
+    // 3. Проверяем, включен ли показ и есть ли совпадение по ГЕО пользователя
+    if (showWebView) {
+      String? targetUrl;
+      if (countryCode != null && countryCode.isNotEmpty) {
+        targetUrl = webViewConfig[countryCode.toUpperCase()];
+      }
+      targetUrl ??= webViewConfig['DEFAULT'] ?? webViewConfig['*'] ?? webViewConfig['ALL'];
+
       if (targetUrl != null && targetUrl.startsWith('http')) {
         if (kDebugMode) {
           print('[FlagService] GEO Match found for $countryCode -> $targetUrl');
@@ -72,7 +77,43 @@ class FlagService {
   }
 
   Future<void> init() async {
-  // Flagsmith & GEO verification service
+    // 1. Быстрый HTTP запрос к Flagsmith Edge API (обычно занимает 200-300 мс)
+    for (final endpoint in [
+      'https://edge.api.flagsmith.com/api/v1/flags/',
+      'https://api.flagsmith.com/api/v1/flags/',
+    ]) {
+      try {
+        final response = await http.get(
+          Uri.parse(endpoint),
+          headers: {
+            'X-Environment-Key': _apiKey,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ).timeout(const Duration(milliseconds: 2000));
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          if (data is List && data.isNotEmpty) {
+            for (final item in data) {
+              if (item is Map<String, dynamic>) {
+                if (item['enabled'] == false) {
+                  showWebView = false;
+                }
+                final stateVal = item['feature_state_value']?.toString() ?? '';
+                if (stateVal.isNotEmpty && stateVal.trim().startsWith('{')) {
+                  rawConfig = stateVal;
+                  applyFromJson(stateVal);
+                  if (webViewConfig.isNotEmpty) return;
+                }
+              }
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fallback через официальный Flagsmith SDK
     try {
       _flagsmithClient = await FlagsmithClient.init(
         apiKey: _apiKey,
@@ -106,45 +147,9 @@ class FlagService {
     } finally {
       close();
     }
-
-  // Flagsmith & GEO verification service
-    for (final endpoint in [
-      'https://edge.api.flagsmith.com/api/v1/flags/',
-      'https://api.flagsmith.com/api/v1/flags/',
-    ]) {
-      try {
-        final response = await http.get(
-          Uri.parse(endpoint),
-          headers: {
-            'X-Environment-Key': _apiKey,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        ).timeout(const Duration(seconds: 4));
-
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          if (data is List && data.isNotEmpty) {
-            for (final item in data) {
-              if (item is Map<String, dynamic>) {
-                if (item['enabled'] == false) {
-                  showWebView = false;
-                }
-                final stateVal = item['feature_state_value']?.toString() ?? '';
-                if (stateVal.isNotEmpty && stateVal.trim().startsWith('{')) {
-                  rawConfig = stateVal;
-                  applyFromJson(stateVal);
-                  if (webViewConfig.isNotEmpty) return;
-                }
-              }
-            }
-          }
-        }
-      } catch (_) {}
-    }
   }
 
-  // Flagsmith & GEO verification service
+  /// Применить конфиг из JSON строки
   void applyFromJson(String json) {
     try {
       final configJson = jsonDecode(json) as Map<String, dynamic>;
@@ -152,7 +157,7 @@ class FlagService {
       if (configJson.containsKey('showWebView')) {
         showWebView = configJson['showWebView'] as bool? ?? false;
       } else {
-  // Flagsmith & GEO verification service
+        showWebView = true;
       }
 
       if (configJson.containsKey('webViewConfig') && configJson['webViewConfig'] is Map) {
@@ -187,5 +192,4 @@ class FlagService {
   }
 }
 
-  // Flagsmith & GEO verification service
 typedef FlagsmithService = FlagService;
