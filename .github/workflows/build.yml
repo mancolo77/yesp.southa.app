@@ -2,7 +2,7 @@ name: Build Release APK & AAB
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
@@ -38,19 +38,17 @@ jobs:
       - name: Build Release APK
         run: flutter build apk --release
 
-      - name: Upload Artifacts to GitHub
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-builds
-          path: |
-            build/app/outputs/bundle/release/*.aab
-            build/app/outputs/flutter-apk/*.apk
+      - name: Extract Version
+        id: get_ver
+        run: |
+          VER=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          echo "tag=v$VER" >> $GITHUB_OUTPUT
 
-      - name: Publish GitHub Release (Direct Download Link)
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: "Release v1.0.0"
+          tag_name: ${{ steps.get_ver.outputs.tag }}
+          name: "Release ${{ steps.get_ver.outputs.tag }}"
           files: |
             build/app/outputs/bundle/release/*.aab
             build/app/outputs/flutter-apk/*.apk
